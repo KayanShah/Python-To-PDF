@@ -89,6 +89,7 @@ export default function Home() {
     showLineNums: true,
     showHeader: true,
     paperSize: 'a4',
+    orientation: 'portrait',
     fontSize: '10',
   });
 
@@ -174,6 +175,7 @@ export default function Home() {
         showLineNums: opts.showLineNums,
         showHeader: opts.showHeader,
         paperSize: opts.paperSize,
+        orientation: opts.orientation,
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -320,6 +322,18 @@ export default function Home() {
                   >
                     <option value="a4">A4 (210 × 297 mm)</option>
                     <option value="letter">Letter (216 × 279 mm)</option>
+                  </select>
+                </div>
+
+                <div className="opt-group">
+                  <label className="opt-label">orientation</label>
+                  <select
+                    className="opt-select"
+                    value={opts.orientation}
+                    onChange={e => setOpts(o => ({ ...o, orientation: e.target.value }))}
+                  >
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
                   </select>
                 </div>
 
