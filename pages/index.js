@@ -234,7 +234,10 @@ export default function Home() {
           ))}
 
           <div className="sidebar-footer">
-            built with Next.js<br />hosted on Vercel
+            created by{' '}
+            <a href="https://github.com/KayanShah" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>
+              Kayan Shah
+            </a>
           </div>
         </aside>
 
@@ -520,6 +523,11 @@ if __name__ == '__main__':
               </div>
             </div>
           </section>
+
+          <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem', marginTop: '2rem', fontSize: '12px', color: 'var(--muted)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <span>made by <a href="https://github.com/KayanShah" target="_blank" rel="noopener noreferrer">Kayan Shah</a></span>
+            <span><a href="https://github.com/KayanShah/Python-To-PDF" target="_blank" rel="noopener noreferrer">view source</a></span>
+          </div>
 
         </main>
       </div>
