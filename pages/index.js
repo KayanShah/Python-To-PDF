@@ -82,6 +82,8 @@ export default function Home() {
   const [status, setStatus] = useState({ type: 'idle', msg: 'ready — drop a .py file to start' });
   const [dragOver, setDragOver] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [pdfBlob, setPdfBlob] = useState(null);
   const [activeSection, setActiveSection] = useState('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [scrollPct, setScrollPct] = useState(0);
@@ -134,6 +136,15 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Preview goes stale as soon as the source or options it was built from change
+  useEffect(() => {
+    if (!pdfPreviewUrl) return;
+    URL.revokeObjectURL(pdfPreviewUrl);
+    setPdfPreviewUrl(null);
+    setPdfBlob(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source, opts.showLineNums, opts.showHeader, opts.paperSize, opts.orientation]);
+
   const processFile = useCallback((f) => {
     if (!f) return;
     if (!f.name.endsWith('.py') && !f.name.endsWith('.pyw')) {
@@ -178,7 +189,7 @@ export default function Home() {
   const handleGenerate = async () => {
     if (!source) return;
     setGenerating(true);
-    setStatus({ type: 'active', msg: 'generating PDF...' });
+    setStatus({ type: 'active', msg: 'generating preview...' });
     try {
       const blob = await generatePDF(source, {
         filename: file?.name || 'script.py',
@@ -187,13 +198,10 @@ export default function Home() {
         paperSize: opts.paperSize,
         orientation: opts.orientation,
       });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = (file?.name || 'script').replace(/\.pyw?$/, '') + '.pdf';
-      a.click();
-      URL.revokeObjectURL(url);
-      setStatus({ type: 'ready', msg: 'PDF downloaded successfully' });
+      if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
+      setPdfBlob(blob);
+      setPdfPreviewUrl(URL.createObjectURL(blob));
+      setStatus({ type: 'ready', msg: 'preview ready — review it below' });
     } catch (err) {
       console.error(err);
       setStatus({ type: 'error', msg: `error: ${err.message}` });
@@ -399,11 +407,13 @@ export default function Home() {
                 onClick={handleGenerate}
                 disabled={!source || generating}
               >
-                {generating ? '[ generating... ]' : '[ download PDF ]'}
+                {generating ? '[ generating... ]' : '[ preview PDF ]'}
               </button>
               {source && (
                 <button className="cta ghost" onClick={() => {
+                  if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
                   setFile(null); setSource(''); setHtmlLines([]); setTokenisedLines([]);
+                  setPdfPreviewUrl(null); setPdfBlob(null);
                   setStatus({ type: 'idle', msg: 'ready — drop a .py file to start' });
                 }}>
                   clear
@@ -411,11 +421,21 @@ export default function Home() {
               )}
             </div>
 
-            {/* Preview */}
+            {/* PDF preview */}
+            {pdfPreviewUrl && (
+              <div style={{ marginTop: '2rem' }}>
+                <div style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+                  &gt;&gt; pdf preview
+                </div>
+                <iframe src={pdfPreviewUrl} className="pdf-preview-frame" title="PDF preview" />
+              </div>
+            )}
+
+            {/* Syntax preview */}
             {htmlLines.length > 0 && (
               <div style={{ marginTop: '2rem' }}>
                 <div style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
-                  &gt;&gt; preview — {tokenisedLines.length} lines
+                  &gt;&gt; syntax preview — {tokenisedLines.length} lines
                 </div>
                 <div className="preview-wrap" ref={previewRef}>
                   {htmlLines.map(({ lineNum, content }) => (
