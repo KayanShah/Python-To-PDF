@@ -1,5 +1,5 @@
 {
-  "name": "py2pdf",
+  "name": "py2pdf-idle",
   "version": "1.0.0",
   "description": "Convert Python source to IDLE-styled PDFs from web or CLI",
   "bin": {
