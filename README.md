@@ -10,6 +10,12 @@ Use with no install:
 npx py2pdf-idle /path/to/script.py
 ```
 
+Example:
+
+```bash
+npx py2pdf-idle ./main.py ./main.pdf --paper letter --no-line-nums
+```
+
 Or install globally:
 
 ```bash
@@ -38,6 +44,8 @@ npx py2pdf-idle ./examples/main.py ./exports/main.pdf --paper letter --orientati
 ```
 
 If `output-file-name.pdf` is omitted, the output defaults to the input filename with `.pdf`.
+
+Not sure what flags you need? The website has a **CLI builder** — fill in your file path and options and it generates the exact command to copy/paste.
 
 ## CLI options
 

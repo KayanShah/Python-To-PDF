@@ -92,6 +92,16 @@ export default function Home() {
     orientation: 'portrait',
     fontSize: '10',
   });
+  const [cli, setCli] = useState({
+    runner: 'npx',
+    input: 'script.py',
+    output: '',
+    paperSize: 'a4',
+    orientation: 'portrait',
+    showLineNums: true,
+    showHeader: true,
+  });
+  const [cliCopied, setCliCopied] = useState(false);
 
   const fileInputRef = useRef();
   const previewRef = useRef();
@@ -110,7 +120,7 @@ export default function Home() {
 
   // Active section tracker
   useEffect(() => {
-    const sections = ['home', 'convert', 'colours', 'about'];
+    const sections = ['home', 'convert', 'cli', 'colours', 'about'];
     const onScroll = () => {
       for (const id of sections.reverse()) {
         const el = document.getElementById(id);
@@ -196,6 +206,27 @@ export default function Home() {
     processFile(fakeFile);
   };
 
+  const buildCliCommand = (c) => {
+    const base = c.runner === 'npx' ? 'npx py2pdf-idle' : 'py2pdf-idle';
+    const parts = [base, c.input.trim() || '<python-file-path>'];
+    if (c.output.trim()) parts.push(c.output.trim());
+    if (c.paperSize !== 'a4') parts.push(`--paper ${c.paperSize}`);
+    if (c.orientation !== 'portrait') parts.push(`--orientation ${c.orientation}`);
+    if (!c.showLineNums) parts.push('--no-line-nums');
+    if (!c.showHeader) parts.push('--no-header');
+    return parts.join(' ');
+  };
+
+  const copyCliCommand = async () => {
+    try {
+      await navigator.clipboard.writeText(buildCliCommand(cli));
+      setCliCopied(true);
+      setTimeout(() => setCliCopied(false), 1500);
+    } catch {
+      setCliCopied(false);
+    }
+  };
+
   const navTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     setSidebarOpen(false);
@@ -225,7 +256,7 @@ export default function Home() {
             <span>py</span>2pdf<span>/</span>v1.0
           </div>
 
-          {['home', 'convert', 'colours', 'about'].map(id => (
+          {['home', 'convert', 'cli', 'colours', 'about'].map(id => (
             <button
               key={id}
               className={`nav-link${activeSection === id ? ' active' : ''}`}
@@ -402,6 +433,112 @@ export default function Home() {
                 </div>
               </div>
             )}
+          </section>
+
+          {/* ── CLI BUILDER ── */}
+          <section id="cli" style={{ marginBottom: '5rem' }}>
+            <div className="section-label">cli builder</div>
+
+            <p className="bq" style={{ marginBottom: '1.5rem' }}>
+              Prefer the terminal? Fill in the fields below and copy the exact command to run — no need to memorise flags.
+            </p>
+
+            <div className="options-grid">
+              <div className="opt-group">
+                <label className="opt-label">runner</label>
+                <select
+                  className="opt-select"
+                  value={cli.runner}
+                  onChange={e => setCli(c => ({ ...c, runner: e.target.value }))}
+                >
+                  <option value="npx">npx (no install)</option>
+                  <option value="global">global install</option>
+                </select>
+              </div>
+
+              <div className="opt-group">
+                <label className="opt-label">python file path</label>
+                <input
+                  className="opt-input"
+                  type="text"
+                  value={cli.input}
+                  onChange={e => setCli(c => ({ ...c, input: e.target.value }))}
+                  placeholder="./path/to/script.py"
+                />
+              </div>
+
+              <div className="opt-group">
+                <label className="opt-label">output file name (optional)</label>
+                <input
+                  className="opt-input"
+                  type="text"
+                  value={cli.output}
+                  onChange={e => setCli(c => ({ ...c, output: e.target.value }))}
+                  placeholder="./exports/script.pdf"
+                />
+              </div>
+
+              <div className="opt-group">
+                <label className="opt-label">paper size</label>
+                <select
+                  className="opt-select"
+                  value={cli.paperSize}
+                  onChange={e => setCli(c => ({ ...c, paperSize: e.target.value }))}
+                >
+                  <option value="a4">A4</option>
+                  <option value="letter">Letter</option>
+                </select>
+              </div>
+
+              <div className="opt-group">
+                <label className="opt-label">orientation</label>
+                <select
+                  className="opt-select"
+                  value={cli.orientation}
+                  onChange={e => setCli(c => ({ ...c, orientation: e.target.value }))}
+                >
+                  <option value="portrait">Portrait</option>
+                  <option value="landscape">Landscape</option>
+                </select>
+              </div>
+
+              <div className="opt-group">
+                <label className="opt-label">options</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div className="toggle-row">
+                    <button
+                      className={`toggle${cli.showLineNums ? ' on' : ''}`}
+                      onClick={() => setCli(c => ({ ...c, showLineNums: !c.showLineNums }))}
+                      aria-label="Toggle line numbers"
+                    />
+                    <span className="toggle-label">line numbers</span>
+                  </div>
+                  <div className="toggle-row">
+                    <button
+                      className={`toggle${cli.showHeader ? ' on' : ''}`}
+                      onClick={() => setCli(c => ({ ...c, showHeader: !c.showHeader }))}
+                      aria-label="Toggle header"
+                    />
+                    <span className="toggle-label">filename header & footer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+              &gt;&gt; your command
+            </div>
+            <div className="preview-wrap" style={{ padding: '0.85rem 1rem' }}>
+              <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '13px', color: 'var(--title)', wordBreak: 'break-all' }}>
+                {buildCliCommand(cli)}
+              </code>
+            </div>
+
+            <div className="btn-row">
+              <button className="cta" onClick={copyCliCommand}>
+                {cliCopied ? '[ copied! ]' : '[ copy command ]'}
+              </button>
+            </div>
           </section>
 
           {/* ── COLOURS ── */}
