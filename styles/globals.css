@@ -259,6 +259,13 @@ a:hover { color: var(--accent2); }
   line-height: 1.6;
 }
 
+.pdf-preview-frame {
+  width: 100%;
+  height: 600px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
 .code-line {
   display: flex;
   min-height: 1.6em;
