@@ -1,6 +1,26 @@
 # py2pdf
 
-Convert Python source files to beautifully formatted PDFs with authentic IDLE syntax highlighting — entirely in the browser.
+Convert Python source files to beautifully formatted PDFs with authentic IDLE syntax highlighting — in the browser or from a Node.js CLI.
+
+## CLI (Node package)
+
+Run directly with npx:
+
+```bash
+npx py2pdf-idle script.py
+```
+
+Or pass output/options:
+
+```bash
+npx py2pdf-idle script.py output.pdf --paper letter --orientation landscape --no-line-nums --no-header
+```
+
+CLI help:
+
+```bash
+npx py2pdf-idle --help
+```
 
 ## Features
 
@@ -27,6 +47,12 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+Run the CLI locally from this repo:
+
+```bash
+npm run cli -- ./TestPyWebsite.py
+```
 
 ## Deploy to Vercel
 
