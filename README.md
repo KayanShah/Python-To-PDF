@@ -51,8 +51,8 @@ Not sure what flags you need? The website has a **CLI builder** — fill in your
 
 | Option | Description | Default |
 |---|---|---|
-| `--paper <a4|letter>` | Page size | `a4` |
-| `--orientation <portrait|landscape>` | Page orientation | `portrait` |
+| `--paper <a4\|letter>` | Page size | `a4` |
+| `--orientation <portrait\|landscape>` | Page orientation | `portrait` |
 | `--no-line-nums` | Hide line numbers | line numbers on |
 | `--no-header` | Hide filename header/footer | header/footer on |
 | `-h`, `--help` | Show help | — |
